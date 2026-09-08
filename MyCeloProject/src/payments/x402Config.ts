@@ -5,7 +5,7 @@ import { getNetworkConfigFromEnv } from '../config/networkConfig.js';
 dotenv.config();
 
 // ─── ERC-8021 Attribution Tags ───────────────────────────────────────────────
-export const ASSIGNED_ATTRIBUTION_TAG = 'celo_4d19a013cc70';
+export const ASSIGNED_ATTRIBUTION_TAG = 'celo_3712ca0f1cdc';
 export const INTERNAL_APP_TAG = 'falconguard_scan';
 
 /**

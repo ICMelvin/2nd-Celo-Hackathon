@@ -34,8 +34,8 @@ export const celoMainnet = defineChain({
     symbol: 'CELO',
   },
   rpcUrls: {
-    default: { http: ['https://forno.celo.org'] },
-    public:  { http: ['https://forno.celo.org'] },
+    default: { http: [import.meta.env.VITE_MAINNET_RPC_URL || 'https://forno.celo.org'] },
+    public:  { http: [import.meta.env.VITE_MAINNET_RPC_URL || 'https://forno.celo.org'] },
   },
   blockExplorers: {
     default: {

@@ -2,6 +2,9 @@
  * Network Configuration for FalconGuard Scan-Agent
  * Single source of truth for network-specific URLs and addresses
  */
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 export interface NetworkConfig {
   chainId: number;
@@ -29,7 +32,7 @@ export const NETWORK_CONFIGS: Record<number, NetworkConfig> = {
     facilitatorUrl: 'https://api.x402.celo.org',
     explorerUrl: 'https://celoscan.io',
     usdcAddress: '0xcEBA9300f2b948710d2653dD7B07f33A8B32118C',
-    rpcUrl: 'https://forno.celo.org',
+    rpcUrl: process.env.MAINNET_RPC_URL || 'https://forno.celo.org',
   },
 };
 

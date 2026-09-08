@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-import { createWalletClient, http, parseUnits, formatUnits } from 'viem';
+import { createWalletClient, createPublicClient, http, parseUnits, formatUnits } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { celo } from 'viem/chains';
 
@@ -28,11 +28,18 @@ async function main() {
   }
 
   const account = privateKeyToAccount(privateKey as `0x${string}`);
-  
+
+  const mainnetRpc = process.env.MAINNET_RPC_URL || 'https://forno.celo.org';
+
+  const publicClient = createPublicClient({
+    chain: celo,
+    transport: http(mainnetRpc),
+  });
+
   const walletClient = createWalletClient({
     account,
     chain: celo,
-    transport: http('https://forno.celo.org'),
+    transport: http(mainnetRpc),
   });
 
   console.log('Registering FalconGuard Scan-Agent on ERC-8004...');
@@ -40,27 +47,29 @@ async function main() {
   
   try {
     const hash = await walletClient.writeContract({
+      account,
       address: IDENTITY_REGISTRY,
       abi: IDENTITY_REGISTRY_ABI,
       functionName: 'register',
       args: [],
+      chain: celo,
     });
     
     console.log('Transaction submitted:', hash);
     console.log('Waiting for confirmation...');
-    
+
     // Wait for transaction receipt
-    const receipt = await walletClient.waitForTransactionReceipt({ hash });
+    const receipt = await publicClient.waitForTransactionReceipt({ hash });
     console.log('Transaction confirmed in block:', receipt.blockNumber);
-    
+
     // Extract agent ID from Transfer event (tokenId is the agent ID)
-    const transferLog = receipt.logs.find(log => 
-      log.topics.length === 4 && 
+    const transferLog = receipt.logs.find((log: any) =>
+      log.topics && log.topics.length === 4 &&
       log.topics[0] === '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
     );
-    
+
     if (transferLog) {
-      const agentId = transferLog.topics[3];
+      const agentId = (transferLog as any).topics[3];
       console.log('\n✅ Agent registered successfully!');
       console.log('Agent ID:', agentId);
       console.log('8004scan URL:', `https://8004scan.io/agents/celo/${agentId}`);
